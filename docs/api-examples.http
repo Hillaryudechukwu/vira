@@ -1,0 +1,94 @@
+### Health
+GET http://localhost:8080/api/v1/health
+
+### Run the complete guarded daily pipeline (idempotent for channel/day)
+POST http://localhost:8080/api/v1/channels/{{channel_id}}/automation/run
+Authorization: Bearer {{operator_token}}
+
+### Review and approve all four immutable private platform bundles
+POST http://localhost:8080/api/v1/automation/{{automation_run_id}}/approve
+Authorization: Bearer {{operator_token}}
+Content-Type: application/json
+
+{"comment": "Video, claims, rights, disclosures, destinations, privacy and schedules reviewed."}
+
+### Record the 24-hour outcome and generate a diagnosis
+POST http://localhost:8080/api/v1/analytics/publications/{{publication_id}}/snapshots
+Authorization: Bearer {{operator_token}}
+Content-Type: application/json
+
+{
+  "window": "24h",
+  "metrics": {
+    "impressions": 1000,
+    "views": 800,
+    "average_watch_percent": 62,
+    "completion_rate": 45,
+    "rewatch_rate": 12,
+    "shares": 24,
+    "saves": 16,
+    "meaningful_comments": 8,
+    "profile_visits": 30,
+    "followers_gained": 10
+  }
+}
+
+### Create topic candidate
+POST http://localhost:8080/api/v1/topics
+Authorization: Bearer {{operator_token}}
+Content-Type: application/json
+
+{
+  "channel_id": "{{channel_id}}",
+  "title": "When silence becomes punishment",
+  "angle": "Distinguish healthy space from conditional withdrawal.",
+  "content_pillar": "hidden_manipulation_patterns",
+  "risk_penalty": 2,
+  "confidence": 85,
+  "scores": {
+    "trend_velocity": 90,
+    "emotional_resonance": 92,
+    "relatability": 95,
+    "curiosity_gap": 85,
+    "share_intent": 88,
+    "comment_potential": 80,
+    "channel_fit": 98,
+    "novelty": 75
+  }
+}
+
+### Select topic
+POST http://localhost:8080/api/v1/topics/{{topic_id}}/select
+Authorization: Bearer {{operator_token}}
+
+### Generate script
+POST http://localhost:8080/api/v1/projects/{{project_id}}/generate-script
+Authorization: Bearer {{operator_token}}
+
+### Prepare publication and immutable approval packet
+POST http://localhost:8080/api/v1/projects/{{project_id}}/prepare-publication
+Authorization: Bearer {{operator_token}}
+Content-Type: application/json
+
+{
+  "platform": "youtube",
+  "metadata": {
+    "title": "When Silence Becomes Punishment",
+    "caption": "Healthy space communicates. Punishment demands surrender.",
+    "hashtags": ["relationships", "mensmentalhealth"]
+  },
+  "media_checksum": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "scheduled_for": "2026-10-01T18:00:00Z",
+  "account_reference": "youtube-channel-1"
+}
+
+### Approve
+POST http://localhost:8080/api/v1/approvals/{{approval_id}}/approve
+Authorization: Bearer {{operator_token}}
+Content-Type: application/json
+
+{"comment": "Video, claims, metadata, disclosures and destination reviewed."}
+
+### Dispatch through configured publisher
+POST http://localhost:8080/api/v1/publications/{{publication_id}}/publish
+Authorization: Bearer {{operator_token}}
