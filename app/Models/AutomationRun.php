@@ -10,6 +10,8 @@ final class AutomationRun extends Model
 {
     use HasUuids;
 
+    protected $attributes = ['context' => '{}'];
+
     protected $guarded = [];
 
     protected function casts(): array

@@ -9,6 +9,8 @@ final class QualityCheck extends Model
 {
     use HasUuids;
 
+    protected $attributes = ['findings' => '[]'];
+
     protected $guarded = [];
 
     protected function casts(): array

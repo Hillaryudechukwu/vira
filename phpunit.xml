@@ -18,6 +18,7 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_URL" value="http://localhost" force="true"/>
         <env name="APP_KEY" value="base64:RnxJ4bGABneFT6iIdv20m1QoEO7ISMG+zl5NX86Ixho="/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
@@ -29,4 +30,3 @@
         <env name="VIRA_PUBLISHER_DRIVER" value="null"/>
     </php>
 </phpunit>
-

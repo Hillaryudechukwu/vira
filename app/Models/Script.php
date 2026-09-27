@@ -10,6 +10,8 @@ final class Script extends Model
 {
     use HasUuids;
 
+    protected $attributes = ['claims' => '[]', 'model_metadata' => '{}'];
+
     protected $guarded = [];
 
     protected function casts(): array

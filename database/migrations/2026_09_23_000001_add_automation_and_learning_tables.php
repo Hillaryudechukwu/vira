@@ -13,9 +13,9 @@ return new class extends Migration
             $table->foreignUuid('channel_id')->constrained('channels')->cascadeOnDelete();
             $table->foreignUuid('content_project_id')->nullable()->constrained('content_projects')->nullOnDelete();
             $table->date('run_on');
-            $table->string('status')->default('running')->index();
-            $table->string('current_stage')->default('discover');
-            $table->jsonb('context')->default('{}');
+            $table->string('status', 32)->default('running')->index();
+            $table->string('current_stage', 64)->default('discover');
+            $table->jsonb('context');
             $table->text('failure')->nullable();
             $table->timestamp('started_at');
             $table->timestamp('completed_at')->nullable();
@@ -27,10 +27,10 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('channel_id')->constrained('channels')->cascadeOnDelete();
             $table->foreignUuid('content_project_id')->nullable()->constrained('content_projects')->nullOnDelete();
-            $table->string('provider');
-            $table->string('capability');
+            $table->string('provider', 100);
+            $table->string('capability', 100);
             $table->decimal('amount_gbp', 10, 4);
-            $table->string('status')->default('reserved')->index();
+            $table->string('status', 32)->default('reserved')->index();
             $table->timestamp('reserved_at');
             $table->timestamp('released_at')->nullable();
             $table->timestamps();
@@ -39,9 +39,9 @@ return new class extends Migration
         Schema::create('quality_checks', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('content_project_id')->constrained('content_projects')->cascadeOnDelete();
-            $table->string('check_type');
-            $table->string('status')->index();
-            $table->jsonb('findings')->default('[]');
+            $table->string('check_type', 64);
+            $table->string('status', 32)->index();
+            $table->jsonb('findings');
             $table->timestamp('checked_at');
             $table->timestamps();
         });
@@ -49,13 +49,13 @@ return new class extends Migration
         Schema::create('metric_snapshots', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('publication_id')->constrained('publications')->cascadeOnDelete();
-            $table->string('window');
+            $table->string('window', 16);
             $table->timestamp('observed_at');
             $table->jsonb('raw_metrics');
             $table->jsonb('normalised_metrics');
-            $table->jsonb('availability')->default('{}');
-            $table->string('source')->default('manual');
-            $table->string('definition_version')->default('v1');
+            $table->jsonb('availability');
+            $table->string('source', 64)->default('manual');
+            $table->string('definition_version', 32)->default('v1');
             $table->timestamps();
             $table->unique(['publication_id', 'window']);
         });

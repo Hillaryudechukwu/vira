@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email', 191)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('timezone')->default('Europe/London');
@@ -24,14 +24,14 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignId('owner_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('status')->default('active');
+            $table->string('slug', 191)->unique();
+            $table->string('status', 32)->default('active');
             $table->text('niche');
             $table->text('mission')->nullable();
             $table->text('audience_summary')->nullable();
             $table->string('default_timezone')->default('Europe/London');
-            $table->string('operating_mode')->default('guarded');
-            $table->jsonb('settings')->default('{}');
+            $table->string('operating_mode', 32)->default('guarded');
+            $table->jsonb('settings');
             $table->timestamps();
         });
 
@@ -40,13 +40,13 @@ return new class extends Migration
             $table->foreignUuid('channel_id')->constrained('channels')->cascadeOnDelete();
             $table->string('title');
             $table->text('angle');
-            $table->string('content_pillar');
-            $table->string('status')->default('discovered')->index();
+            $table->string('content_pillar', 100);
+            $table->string('status', 32)->default('discovered')->index();
             $table->jsonb('component_scores');
             $table->decimal('viral_score', 5, 2)->index();
             $table->decimal('risk_score', 5, 2)->default(0);
             $table->decimal('confidence', 5, 2)->default(0);
-            $table->jsonb('score_explanation')->default('{}');
+            $table->jsonb('score_explanation');
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
             $table->index(['channel_id', 'status', 'viral_score']);
@@ -58,7 +58,7 @@ return new class extends Migration
             $table->foreignUuid('topic_candidate_id')->unique()->constrained('topic_candidates')->restrictOnDelete();
             $table->string('working_title');
             $table->text('objective');
-            $table->string('status')->default('drafting')->index();
+            $table->string('status', 32)->default('drafting')->index();
             $table->unsignedInteger('target_duration_ms')->default(45000);
             $table->string('aspect_ratio')->default('9:16');
             $table->string('language')->default('en-GB');
@@ -74,10 +74,10 @@ return new class extends Migration
             $table->unsignedInteger('word_count');
             $table->unsignedInteger('estimated_duration_ms');
             $table->jsonb('structure');
-            $table->jsonb('claims')->default('[]');
-            $table->jsonb('model_metadata')->default('{}');
+            $table->jsonb('claims');
+            $table->jsonb('model_metadata');
             $table->string('prompt_version');
-            $table->string('status')->default('draft');
+            $table->string('status', 32)->default('draft');
             $table->timestamps();
             $table->unique(['content_project_id', 'version']);
         });
@@ -85,12 +85,12 @@ return new class extends Migration
         Schema::create('generation_requests', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('content_project_id')->constrained('content_projects')->cascadeOnDelete();
-            $table->string('provider');
-            $table->string('capability');
+            $table->string('provider', 100);
+            $table->string('capability', 100);
             $table->string('request_hash', 64)->unique();
             $table->jsonb('input');
-            $table->string('provider_request_id')->nullable()->index();
-            $table->string('status')->default('pending')->index();
+            $table->string('provider_request_id', 191)->nullable()->index();
+            $table->string('status', 32)->default('pending')->index();
             $table->unsignedSmallInteger('attempt_count')->default(0);
             $table->decimal('estimated_cost_gbp', 10, 4)->default(0);
             $table->decimal('actual_cost_gbp', 10, 4)->nullable();
@@ -104,7 +104,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('content_project_id')->constrained('content_projects')->cascadeOnDelete();
             $table->foreignUuid('generation_request_id')->nullable()->constrained('generation_requests')->nullOnDelete();
-            $table->string('asset_type')->index();
+            $table->string('asset_type', 50)->index();
             $table->string('disk')->default('local');
             $table->text('object_key');
             $table->string('mime_type');
@@ -114,16 +114,16 @@ return new class extends Migration
             $table->unsignedInteger('height')->nullable();
             $table->unsignedInteger('duration_ms')->nullable();
             $table->decimal('frame_rate', 6, 3)->nullable();
-            $table->jsonb('provenance')->default('{}');
-            $table->string('rights_status')->default('pending_review');
+            $table->jsonb('provenance');
+            $table->string('rights_status', 32)->default('pending_review');
             $table->timestamps();
         });
 
         Schema::create('publications', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('content_project_id')->constrained('content_projects')->cascadeOnDelete();
-            $table->string('platform')->index();
-            $table->string('status')->default('draft')->index();
+            $table->string('platform', 32)->index();
+            $table->string('status', 32)->default('draft')->index();
             $table->jsonb('metadata');
             $table->string('media_checksum', 64);
             $table->unsignedInteger('metadata_version')->default(1);
@@ -139,7 +139,7 @@ return new class extends Migration
         Schema::create('approval_requests', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('publication_id')->unique()->constrained('publications')->cascadeOnDelete();
-            $table->string('status')->default('pending')->index();
+            $table->string('status', 32)->default('pending')->index();
             $table->string('review_hash', 64);
             $table->jsonb('review_payload');
             $table->timestamp('expires_at')->nullable();
@@ -153,10 +153,10 @@ return new class extends Migration
             $table->id();
             $table->foreignUuid('publication_id')->constrained('publications')->cascadeOnDelete();
             $table->unsignedInteger('attempt');
-            $table->string('stage');
-            $table->string('provider_request_id')->nullable();
+            $table->string('stage', 64);
+            $table->string('provider_request_id', 191)->nullable();
             $table->unsignedSmallInteger('response_code')->nullable();
-            $table->jsonb('response_metadata')->default('{}');
+            $table->jsonb('response_metadata');
             $table->boolean('retryable')->default(false);
             $table->text('error')->nullable();
             $table->timestamp('next_retry_at')->nullable();
@@ -166,8 +166,10 @@ return new class extends Migration
 
         Schema::create('agent_decisions', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->string('decision_type')->index();
-            $table->nullableUuidMorphs('subject');
+            $table->string('decision_type', 64)->index();
+            $table->uuid('subject_id')->nullable();
+            $table->string('subject_type', 128)->nullable();
+            $table->index(['subject_type', 'subject_id']);
             $table->jsonb('input_summary');
             $table->jsonb('output');
             $table->string('prompt_version')->nullable();
@@ -178,19 +180,21 @@ return new class extends Migration
 
         Schema::create('provider_usage', function (Blueprint $table): void {
             $table->id();
-            $table->string('provider')->index();
-            $table->string('capability');
-            $table->nullableUuidMorphs('subject');
+            $table->string('provider', 100)->index();
+            $table->string('capability', 100);
+            $table->uuid('subject_id')->nullable();
+            $table->string('subject_type', 128)->nullable();
+            $table->index(['subject_type', 'subject_id']);
             $table->string('request_hash', 64)->index();
             $table->decimal('estimated_cost_gbp', 10, 4)->default(0);
             $table->decimal('actual_cost_gbp', 10, 4)->nullable();
-            $table->jsonb('usage')->default('{}');
+            $table->jsonb('usage')->nullable();
             $table->timestamps();
         });
 
         Schema::create('jobs', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->string('queue')->index();
+            $table->string('queue', 64)->index();
             $table->longText('payload');
             $table->unsignedTinyInteger('attempts');
             $table->unsignedInteger('reserved_at')->nullable();
@@ -199,7 +203,7 @@ return new class extends Migration
         });
 
         Schema::create('job_batches', function (Blueprint $table): void {
-            $table->string('id')->primary();
+            $table->string('id', 191)->primary();
             $table->string('name');
             $table->integer('total_jobs');
             $table->integer('pending_jobs');
@@ -213,7 +217,7 @@ return new class extends Migration
 
         Schema::create('failed_jobs', function (Blueprint $table): void {
             $table->id();
-            $table->string('uuid')->unique();
+            $table->string('uuid', 64)->unique();
             $table->text('connection');
             $table->text('queue');
             $table->longText('payload');
@@ -222,19 +226,19 @@ return new class extends Migration
         });
 
         Schema::create('cache', function (Blueprint $table): void {
-            $table->string('key')->primary();
+            $table->string('key', 191)->primary();
             $table->mediumText('value');
             $table->integer('expiration');
         });
 
         Schema::create('cache_locks', function (Blueprint $table): void {
-            $table->string('key')->primary();
-            $table->string('owner');
+            $table->string('key', 191)->primary();
+            $table->string('owner', 191);
             $table->integer('expiration');
         });
 
         Schema::create('sessions', function (Blueprint $table): void {
-            $table->string('id')->primary();
+            $table->string('id', 191)->primary();
             $table->foreignId('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();

@@ -12,6 +12,8 @@ final class TopicCandidate extends Model
 {
     use HasUuids;
 
+    protected $attributes = ['score_explanation' => '{}'];
+
     protected $guarded = [];
 
     protected function casts(): array

@@ -10,6 +10,8 @@ final class Channel extends Model
 {
     use HasUuids;
 
+    protected $attributes = ['settings' => '[]'];
+
     protected $guarded = [];
 
     protected function casts(): array

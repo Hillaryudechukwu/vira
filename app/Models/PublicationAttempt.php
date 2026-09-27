@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class PublicationAttempt extends Model
 {
+    protected $attributes = ['response_metadata' => '{}'];
+
     protected $guarded = [];
 
     protected function casts(): array

@@ -9,6 +9,8 @@ final class MediaAsset extends Model
 {
     use HasUuids;
 
+    protected $attributes = ['provenance' => '{}'];
+
     protected $guarded = [];
 
     protected function casts(): array

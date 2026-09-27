@@ -10,6 +10,8 @@ final class MetricSnapshot extends Model
 {
     use HasUuids;
 
+    protected $attributes = ['availability' => '{}'];
+
     protected $guarded = [];
 
     protected function casts(): array
