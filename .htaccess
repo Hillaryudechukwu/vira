@@ -1,0 +1,11 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Shared-hosting fallback when the domain document root cannot be set to
+    # this Laravel application's public/ directory.
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^public(?:/|$) - [L]
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+Options -Indexes
