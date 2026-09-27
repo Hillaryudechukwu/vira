@@ -20,13 +20,14 @@ This package implements the first vertical slice from `VIRA_Implementation_JEM.m
 - Approval, rejection, expiry, and invalidation logic.
 - Platform publication records and deterministic idempotency keys.
 - Locked, retryable publishing job.
-- Null publisher that completes the workflow without external side effects.
+- Null publisher that keeps non-TikTok automation side-effect free.
 - Idempotent daily guarded automation: ten candidates through four platform approval bundles.
 - Daily/monthly budget reservation with fail-closed caps.
 - Automated evidence/claim and hostile-language quality gate.
 - Private-by-default, synthetic-media-labelled metadata for every platform.
 - Due-publication scheduler with platform-isolated jobs.
 - 30m/2h/24h/7d metric snapshots, normalisation, QAG1000, and performance diagnosis.
+- Protected browser control room with TikTok OAuth, encrypted tokens, creator settings, media preview, draft upload, explicit-consent Direct Post, and processing status.
 - Operator bearer-token middleware.
 - Docker Compose stack with app, Horizon worker, scheduler, PostgreSQL, Redis, and FFmpeg.
 - Unit and feature tests for the core guarded workflow.
@@ -34,16 +35,51 @@ This package implements the first vertical slice from `VIRA_Implementation_JEM.m
 
 ## Deliberately not activated
 
-- Real OpenAI calls.
-- VideoGen or another paid video-generation API.
-- Voice provider API.
+- Paid OpenAI/ElevenLabs calls until production credentials are configured.
+- Full motion generative video; automatic V1 uses generated scene imagery with cinematic motion/composition.
 - YouTube OAuth/upload.
-- TikTok Direct Post.
+- Live TikTok use until developer credentials, requested scopes, verified media URL prefix, and app review are configured.
 - Instagram/Facebook Reels publishing.
 - Live platform analytics collectors (manual/API snapshot ingestion is implemented).
 - Full autopilot.
 
 Those pieces require vendor accounts, OAuth application review, current scopes, live credentials, and explicit approval before external side effects. The contracts and state model are ready for their adapters.
+
+## TikTok review setup
+
+Set the following only in the production environment:
+
+```dotenv
+TIKTOK_CLIENT_KEY=
+TIKTOK_CLIENT_SECRET=
+TIKTOK_REDIRECT_URI=https://vira.synteric.co.uk/integrations/tiktok/callback
+TIKTOK_SCOPES=user.info.basic,video.upload,video.publish
+TIKTOK_MEDIA_HOSTS=vira.synteric.co.uk
+```
+
+Register the redirect URI exactly in TikTok Login Kit, request both Content
+Posting scopes, and verify the `https://vira.synteric.co.uk/media/` URL prefix
+for `PULL_FROM_URL`. Open `/operator/login`, connect the review account, upload
+or select a video, and demonstrate draft and Direct Post as separate actions.
+See `docs/TIKTOK_REVIEW.md` for the recording checklist.
+
+## Automatic video generation
+
+VIRA can generate a complete vertical master from the current script using
+OpenAI scene imagery, ElevenLabs narration, timed captions, and FFmpeg:
+
+```dotenv
+OPENAI_API_KEY=
+OPENAI_IMAGE_MODEL=gpt-image-2.5-flare
+ELEVENLABS_API_KEY=
+ELEVENLABS_VOICE_ID=
+ELEVENLABS_MODEL_ID=eleven_multilingual_v2
+FFMPEG_BINARY=ffmpeg
+```
+
+The queue worker must have FFmpeg and network access. Provider credentials stay
+server-side, and generated masters appear in the dashboard preview and platform
+publishing selector.
 
 ## Quick start with Docker
 
@@ -98,6 +134,41 @@ docker compose run --rm \
   -e QUEUE_CONNECTION=sync \
   app php artisan test
 ```
+
+## Deploy to vira.synteric.co.uk
+
+The legal homepage, privacy policy, terms, and data-deletion instructions are
+served by Laravel alongside the VIRA API. Configure the domain's document root
+as `/home/tripuwtd/vira.synteric.co.uk/public`, create the production `.env` in
+the application directory, then run:
+
+```bash
+./deploy.sh
+```
+
+Preview the file transfer without changing the server with
+`DRY_RUN=true ./deploy.sh`. Server connection and path defaults can be
+overridden through the environment variables documented in
+`docs/LEGAL_SITE.md`. When Composer is unavailable over SSH, the deployment
+automatically uploads the locally installed `vendor/` dependencies instead.
+Before maintenance mode, deployment also verifies that the remote PHP CLI has
+the PDO driver selected by the production `DB_CONNECTION`. Override the CLI
+binary with `REMOTE_PHP` when the host exposes extensions through a versioned
+PHP executable.
+
+If an initial MySQL migration failed after partially creating tables, and the
+database contains no data that must be retained, recover explicitly with
+`FRESH_DATABASE=true ./deploy.sh`. The script requires typing `ERASE` before it
+drops any tables.
+
+On shared hosting without Redis, production must use `CACHE_STORE=database`,
+`QUEUE_CONNECTION=database`, and `SESSION_DRIVER=database`. Deployment removes
+stale bootstrap configuration before Artisan starts and verifies these runtime
+drivers before maintenance mode.
+
+If the hosting panel cannot point the domain at `public/`, the repository-level
+`.htaccess` safely forwards requests into Laravel's public directory. Using
+`public/` as the configured document root remains preferred.
 
 ## Automated workflow
 

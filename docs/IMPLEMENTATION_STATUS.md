@@ -6,6 +6,27 @@ The repository now implements a guarded, side-effect-free daily automation path.
 
 Metric snapshots can be ingested for the 30m, 2h, 24h, and 7d windows. VIRA normalises available fields, calculates QAG1000, records uncertainty, and produces a controlled next-experiment recommendation. The deterministic reasoner, manual media route, and null publisher make this complete lifecycle reproducible without paid credentials or external side effects.
 
+## TikTok review vertical slice
+
+VIRA now includes a protected browser control room, TikTok Login Kit OAuth,
+encrypted access and refresh tokens, connected creator identity, live
+creator-info settings, 50 MB review-video upload, in-browser preview, inbox
+draft upload, separately consented Direct Post, AI-content disclosure, privacy
+and interaction controls, publish IDs, and manual/automatic status polling.
+
+Automated tests fake TikTok's HTTP API. Live use remains gated by production
+credentials, granted `video.upload` and `video.publish` scopes, a verified media
+URL prefix, an authorised reviewer account, and TikTok's audit restrictions.
+
+## Automatic media production
+
+The control room can queue automatic production for any project with a current
+script. OpenAI generates one cinematic vertical scene image per beat,
+ElevenLabs synthesises narration, VIRA creates timed SRT captions, and FFmpeg
+renders a 1080×1920 H.264/AAC master. Generation requests and final asset
+provenance are persisted. Live operation requires provider credentials and an
+FFmpeg-enabled queue worker; tests use HTTP fakes and spend no provider credits.
+
 ## Safety invariants
 
 - Daily automation is idempotent per channel.
